@@ -6,6 +6,7 @@ def main_menu():
     print("Welcome to the Piano Tuning Booking System")
     client_id = input("Please enter your client ID: ")
     location = input("Enter the location for the tuning service: ")
+    date = input("Enter the date for the tuning service (YYYY-MM-DD): ")
 
     slots = handler.offer_time_slots(client_id, location)
     print("Available time slots:")
@@ -15,7 +16,7 @@ def main_menu():
     chosen_slot = input("Choose a slot (morning/afternoon): ")
     start_time, end_time = slots[chosen_slot].split(" - ")[1].split(" to ")
 
-    new_appointment = Appointment(client_id, location, start_time, end_time)
+    new_appointment = Appointment(client_id, location, start_time, end_time, date)
     handler.save_appointment(new_appointment)
     print("Your appointment has been booked.")
 

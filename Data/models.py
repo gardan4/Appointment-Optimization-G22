@@ -5,8 +5,9 @@ class Location:
 
 
 class Appointment:
-    def __init__(self, client_id, location, start_time, end_time):
+    def __init__(self, client_id, location, start_time, end_time, date):
         self.client_id = client_id
         self.location = location
         self.start_time = start_time
         self.end_time = end_time
+        self.date = date
