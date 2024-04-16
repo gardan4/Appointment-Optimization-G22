@@ -3,6 +3,7 @@ class Location:
         self.name = name
         self.coordinates = coordinates
 
+
 class Appointment:
     def __init__(self, client_id, location, start_time, end_time):
         self.client_id = client_id
