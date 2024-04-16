@@ -1,6 +1,3 @@
-import random
-from models import Appointment, Location
-
 def generate_synthetic_data(num_appointments):
     # Generate synthetic data for appointments
     for _ in range(num_appointments):

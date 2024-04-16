@@ -1,5 +1,5 @@
 from models import Appointment
-from optimizer import optimize_schedule
+from Scheduler.optimizer import optimize_schedule
 
 def handle_booking_request(client_id, requested_slot, location):
     # Create an appointment and optimize the schedule
