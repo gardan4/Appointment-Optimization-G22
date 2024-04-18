@@ -1,16 +1,20 @@
 import json
 from datetime import datetime, timedelta
 
+
 def read_appointments(file_path, date):
     with open(file_path, "r") as file:
         all_appointments = json.load(file)
     appointments = [
-        appt for appt in all_appointments if datetime.strptime(appt['date'], "%Y-%m-%d").date() == datetime.strptime(date, "%Y-%m-%d").date()
+        appt for appt in all_appointments if
+        datetime.strptime(appt['date'], "%Y-%m-%d").date() == datetime.strptime(date, "%Y-%m-%d").date()
     ]
     return appointments
 
+
 def compute_optimal_path(appointments):
     return sorted(appointments, key=lambda x: datetime.strptime(x['start_time'], "%H:%M"))
+
 
 def finalize_appointments(appointments):
     optimized_appointments = compute_optimal_path(appointments)
@@ -25,6 +29,7 @@ def finalize_appointments(appointments):
         current_time += timedelta(hours=1)
     return final_schedule
 
+
 def test_optimizer():
     # Test the optimizer with synthetic data
     test_data = [
@@ -34,6 +39,7 @@ def test_optimizer():
     optimized_schedule = finalize_appointments(test_data)
     for appt in optimized_schedule:
         print(f"Client {appt['client_id']} - {appt['location']} from {appt['start_time']} to {appt['end_time']}")
+
 
 if __name__ == "__main__":
     test_optimizer()
