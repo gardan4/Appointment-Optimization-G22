@@ -19,23 +19,27 @@ def generate_time_slot_layout():
     next_week = dates[7:]
 
     # Helper function to create a day column
-    def create_day_column(day, dates):
+    def create_day_column(day, date):
+        print(date)
         return html.Div(className='day-column', children=[
-            html.Div(day, className='week-title', style={'color': 'white'}),
+            html.Div(f"{day} {date[0].strftime('%m-%d')}", className='week-title', style={'color': 'white'}),
             dcc.Checklist(
                 options=[
-                    {'label': 'Morning slot: 09:00 - 12:00', 'value': f'{day}_morning'},
-                    {'label': 'Evening slot: 01:00 - 17:00', 'value': f'{day}_evening'},
+                    {'label': 'Morning slot: 09:00 - 12:00', 'value': f'{date[0].strftime("%Y-%m-%d")}_morning'},
+                    {'label': 'Evening slot: 01:00 - 17:00', 'value': f'{date[0].strftime("%Y-%m-%d")}_evening'},
                 ],
                 value=[],
-                id=f'checklist-{day}',
+                id={'type': 'checklist', 'index': date[0].strftime('%Y-%m-%d')},
                 className="timeslot"
             )
         ])
 
     # Generate columns for each day
-    this_week_columns = [create_day_column(day, this_week) for day in ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo']]
-    next_week_columns = [create_day_column(day, next_week) for day in ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo']]
+    #also pass the current date to the create_day_column function
+    this_week_columns = [create_day_column(date.strftime('%A'), [date]) for date in this_week]
+    next_week_columns = [create_day_column(date.strftime('%A'), [date]) for date in next_week]
+
+
 
     layout = html.Div(children=[
         html.Div('This week', className='week-title', style={'color': 'white'}),
