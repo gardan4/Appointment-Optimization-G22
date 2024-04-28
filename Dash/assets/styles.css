@@ -1,0 +1,122 @@
+/* styles.css */
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.logo-container {
+    flex: 1;
+    text-align: center;
+}
+
+.logo {
+    height: 70; /* Adjust the height of the logo */
+}
+
+.title-container {
+    flex: 1;
+    text-align: left;
+}
+
+.title {
+    margin-left: 20px; /* Adjust the margin as needed */
+}
+
+body, .mantine-Header-root {
+    font-family: "MBCorpo Text","sans-serif";
+    background-color: #1e1e1e !important;
+    /* background-color: var(--body-background-color) */
+}
+
+ .mantine-Navbar-root {
+    background-color: #1e1e1e!important;
+}
+
+.mantine-Anchor-root {
+    color: #fff!important;
+}
+.nav-list-items {
+    padding: 1rem;
+    color: #1e1e1e!important;
+    text-decoration: none;
+    list-style: none;
+}
+
+.nav-list-items { /*!here to change the color of the text in the navbar by putting hover option when the mouse cursor is on top of them then the color changes to white*/
+    color: #f2f4f6!important;
+    /* background-color: #1e1e1e!important; */
+}
+
+.mantine-Navbar-root a:-webkit-any-link{
+    text-decoration: none;
+    color: #f2f4f6 !important;
+}
+
+.mantine-Navbar-root ::marker{
+    display: none;
+}
+
+.mantine-Group-root {
+    display: flex; /* Use flexbox layout */
+    justify-content: space-between; /* Distribute space between items */
+    align-items: center; /* Align items vertically in the center */
+  }
+
+.mantine-Group-root img {
+    margin-right: auto; /* Push the image to the left */
+  }
+
+.mantine-Group-root .text {
+    text-align: left; /* Center-align the text */
+  }
+
+.mantine-Header-root .toggle-button {
+    margin-left: auto; /* Push the toggle button to the right */
+  }
+
+.ag-theme-alpine {
+    /* --ag-foreground-color: rgb(238, 233, 238); */
+    --ag-background-color: rgb(68, 68, 66);
+    --ag-header-foreground-color: rgb(64, 65, 63);
+    --ag-header-background-color: rgb(62, 60, 61);
+    --ag-odd-row-background-color: rgb(0, 0, 0, 0.03);
+    /* --ag-header-column-resize-handle-color: rgb(231, 223, 232); */
+
+    --ag-font-size: 17px;
+    --ag-font-family: monospace;
+}
+
+/* Sidebar full width for larger screens */
+.responsive-navbar {
+    width: 280px;
+}
+
+/* Specific icon and text styles within list items */
+.nav-list-items i {
+    margin-right: 10px; /* Space between icon and text */
+}
+
+.nav-list-items span {
+    display: inline; /* Ensures text is in line with the icon */
+}
+
+/* Adjustments for smaller screens */
+@media (max-width: 768px) {
+    .responsive-navbar {
+        width: 60px; /* Reduced width for small screens */
+    }
+
+    /* Hide text labels on smaller screens */
+    .nav-list-items span {
+        display: none; /* Completely hide the text */
+    }
+}
+
+.mantine-List-item {
+    padding: 10px;
+    text-decoration: none;
+    list-style: none;
+}
