@@ -1,0 +1,61 @@
+.week-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.day-column {
+    flex: 1;
+    min-width: 150px; /* Ensuring that it does not get too narrow */
+    margin: 0 10px;
+}
+
+.timeslot {
+    border: 1px solid #000;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #f8f9fa;
+    position: relative; /* Required for absolute positioning of children */
+}
+
+.week-title {
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.confirm-button-container {
+    width: 100%;
+    text-align: center;
+}
+
+.button-confirm {
+    background-color: #000;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-block; /* So it doesn't stretch the full width */
+    margin-top: 20px;
+}
+
+.button-confirm:hover {
+    background-color: #444;
+}
+
+.selection-field {
+    position: relative;
+    cursor: pointer;
+    height: 50%; /* Makes the field occupy half the height of the container */
+    width: 100%;
+}
+
+.selected {
+    background-color: #e8e8e8; /* Slightly changes the color when selected */
+}
+

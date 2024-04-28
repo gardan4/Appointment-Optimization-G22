@@ -5,6 +5,7 @@ from dash import html, dcc, Input, Output, State, ctx
 import dash_bootstrap_components as dbc
 from Dash.callbacks import callback_register
 from Dash.callbacks import callback_login
+from Dash.callbacks import callback_appointments
 
 # app.config['SECRET_KEY'] = 'your_secret_key'
 
@@ -15,7 +16,7 @@ header = dmc.Header(
         dmc.Group(
             position="apart",
             children=[
-                dmc.Text("Your App Name", color="white", size="xl"),
+                dmc.Text("Appointment Planner", color="white", size="xl", style={"margin": "0px 20px"}),
                 html.Div(
                     id='navigation-links',
                     children=[
@@ -42,7 +43,7 @@ app.layout = html.Div([
             dmc.Container(
                 children=[
                     header,
-                    dmc.Container(dash.page_container, fluid=True)
+                    dmc.Container(dash.page_container, fluid=True, style={"marginTop": "80px"})
                 ],
                 fluid=True,
             )
