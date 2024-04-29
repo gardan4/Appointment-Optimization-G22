@@ -1,2 +1,6 @@
 pandas~=2.2.2
 numpy~=1.26.4
+dash
+dash-bootstrap-components
+dash_mantine_components == 0.13.0a3
+
