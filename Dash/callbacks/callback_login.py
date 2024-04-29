@@ -6,7 +6,7 @@ import os
 
 # Function to check if user is registered
 def is_user_registered(name):
-    users_file = 'users.txt'
+    users_file = './Data/users.txt'
     if os.path.exists(users_file):
         with open(users_file, 'r') as file:
             for line in file:

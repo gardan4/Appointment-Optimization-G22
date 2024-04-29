@@ -7,7 +7,7 @@ import os
 # Function to register user
 def register_user(name, city):
     # Path to the user data file
-    users_file = 'users.txt'
+    users_file = './Data/users.txt'
 
     # Check if file exists, if not, create it
     if not os.path.exists(users_file):
