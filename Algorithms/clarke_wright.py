@@ -119,14 +119,35 @@ class ClarkeWright:
                 routes.pop(start_point)
                 routes.pop(end_point)
 
+        final_route = []
         for route in routes:
-            route.append(self.depot)
-            route.insert(0, self.depot)
+            final_route += route
+            # route.append(self.depot)
+            # route.insert(0, self.depot)
 
-        return routes
+        final_route.append(self.depot)
+        final_route.insert(0, self.depot)
+
+        self.route = final_route
+        self.compute_route_length()
+
+        return self.final_route
+
+    def compute_route_length(self):
+        length = 0;
+
+        for i in range(len(self.route) - 1):
+            length += self.distances[self.route[i]].loc[self.route[i+1]]
+
+            if self.route[i] is not self.depot:
+                length += 60
+
+        self.total_distance = length
+
+        return self.total_distance
 
     def get_solution(self):
-        return self.route, self.total_distance
+        return self.route, self.to_hours(self.total_distance)
 
     def is_feasible(self, client):
         # init
@@ -141,6 +162,13 @@ class ClarkeWright:
 
         return client in solution
 
+    def to_hours(self, minutes):
+        hours = math.floor(minutes / 60)
+        mins = int(minutes - (hours * 60))
+
+        return f"{hours}h{mins}min"
+
 if __name__ == "__main__":
     algo = ClarkeWright(['Mierlo', 'Geldrop', 'Helmond', 'Someren', 'Deurne Vlierden'])
-    print(algo.solve())
+    algo.solve()
+    print(algo.get_solution())
