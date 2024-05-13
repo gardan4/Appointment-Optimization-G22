@@ -33,7 +33,6 @@ def update_selected_timeslots(n_clicks, selected_timeslots):
 
 
 # Callback to update selection field style
-
 @app.callback(
     Output({'type': 'selection-field', 'day': MATCH, 'slot': MATCH}, 'className'),
     [Input({'type': 'timeslot-checklist', 'day': MATCH, 'slot': MATCH}, 'value')],
