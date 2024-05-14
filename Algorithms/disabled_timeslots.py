@@ -3,6 +3,24 @@ def get_disabled_timeslots(dates, location):
     """
     Get the disabled timeslots for 2 weeks
     """
+    print(location)
+    print(dates)
+    disabled = []
+    for date in dates:
+        disable = [False, False]
+        for timeslot in ['morning', 'evening']:
+            # get current appointments for this date and timeslot
+            # check if travel time is possible
+            # return True if travel time is not possible
+            if timeslot == 'morning' and not get_travel_possible(location, date, timeslot):
+                disable[0] = True
+            elif timeslot == 'evening' and not get_travel_possible(location, date, timeslot):
+                disable[1] = True
+        disabled.append(disable)
+    return disabled
 
-
-    return [[True, False] for _ in range(14)]
+def get_travel_possible(location, date, timeslot):
+    """
+    Check if travel time is possible
+    """
+    return True
