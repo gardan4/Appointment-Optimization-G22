@@ -10,10 +10,10 @@ def is_user_registered(name):
     if os.path.exists(users_file):
         with open(users_file, 'r') as file:
             for line in file:
-                registered_name, _ = line.strip().split(',', 1)
+                registered_name, registered_location = line.strip().split(',', 1)
                 if registered_name == name:
-                    return True
-    return False
+                    return [registered_name, registered_location]
+    return [False, False]
 
 
 @app.callback(
@@ -24,9 +24,10 @@ def is_user_registered(name):
 )
 def login(n_clicks, name):
     if n_clicks:
-        if name and is_user_registered(name):
+        user_data = is_user_registered(name)
+        if name and user_data[0] == name:
             # Log the user in by setting the session data and redirecting
-            return {'username': name}, '/plan_appointment'
+            return {'username': user_data[0], 'location': user_data[1]}, '/plan_appointment'
         else:
             # Clear any existing session data and force stay on the login page
             return {}, '/login'

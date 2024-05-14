@@ -1,13 +1,11 @@
 import dash
 from Dash.index import app
-import dash_mantine_components as dmc
 from dash import html, dcc, Input, Output, State, ctx
+import dash_mantine_components as dmc
 import dash_bootstrap_components as dbc
 from Dash.callbacks import callback_register
 from Dash.callbacks import callback_login
 from Dash.callbacks import callback_appointments
-
-# app.config['SECRET_KEY'] = 'your_secret_key'
 
 header = dmc.Header(
     fixed=True,
@@ -112,6 +110,3 @@ def protect_pages(session_data):
         return dcc.Location(href='/login', id='login-redirect')
     # Otherwise, allow access to the page content
     return html.Div(id='page-content')
-
-# Remember to add similar protection to all pages that require authentication
-
