@@ -11,13 +11,16 @@ import json
     Input('session-store', 'data'),
 )
 def generate_planned_appointments_layout(user_data):
-    with open("./Data/planned_appointments.json", mode='r') as json_file:
-        data = json.load(json_file)
-        planned_appointments = pd.DataFrame(data)
-        planned_appointments = planned_appointments[planned_appointments['username'] == user_data['username']]
-        planned_appointments = planned_appointments.to_dict('records')
-        print(planned_appointments)
-        return planned_appointments
+    if user_data:
+        with open("./Data/planned_appointments.json", mode='r') as json_file:
+            data = json.load(json_file)
+            planned_appointments = pd.DataFrame(data)
+            if 'username' in planned_appointments:
+                planned_appointments = planned_appointments[planned_appointments['username'] == user_data['username']]
+                planned_appointments = planned_appointments.to_dict('records')
+                return planned_appointments
+            return []
+    return []
 
 layout = html.Div(
     children=[
@@ -51,8 +54,6 @@ def selected(_, rows):
     # delete selected rows from json file
     with open("./Data/planned_appointments.json", mode='r') as json_file:
         data = json.load(json_file)
-        print(data)
-        print(rows)
         for row in rows:
             data.remove(row)
         with open("./Data/planned_appointments.json", mode='w') as json_file:

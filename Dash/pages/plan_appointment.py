@@ -69,7 +69,9 @@ def generate_time_slot_layout(user_data):
         html.Div(
             html.Button('Select timeslots and press OK', id='confirm-selection', className="button-confirm"),
             className='confirm-button-container'
-        )
+        ),
+        dmc.Text("Selected Timeslots: ", id="selected_timeslots_text",  color="white", size="xl", style={"margin": "auto", "margin-top": "20px", "display": "block", "text-align": "center"}),
+        dmc.Text("", id="definitive_timeslot_text", color="white", size="xl", style={"margin": "auto", "margin-top": "20px", "display": "block", "text-align": "center"}),
     ])
 
     return layout

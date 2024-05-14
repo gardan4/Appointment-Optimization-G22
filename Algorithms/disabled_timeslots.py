@@ -3,8 +3,6 @@ def get_disabled_timeslots(dates, location):
     """
     Get the disabled timeslots for 2 weeks
     """
-    print(location)
-    print(dates)
     disabled = []
     for date in dates:
         disable = [False, False]
