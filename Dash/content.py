@@ -56,7 +56,6 @@ app.layout = html.Div([
     Input('session-store', 'data'),
 )
 def update_navigation_links(session_data):
-    print(session_data)
     if session_data and 'username' in session_data:
         # User is logged in, show all links including Logout
         return [
