@@ -15,27 +15,25 @@ def to_hours(minutes):
 
 class ClarkeWright:
     def __init__(self, clients):
-        self.depot = clients[0]
-        clients.pop(0)
+        self.depot = Client('depot', 'Mierlo', None)
         self.clients = clients
 
         self.route = None
-        self.savings = None
         self.distances = None
         self.total_distance = 0
 
-    def compute_savings(self):
+    def compute_savings(self, clients):
         self.distances = pd.read_csv('..//Data//distance_matrix.csv', index_col=0)
 
         start = []
         end = []
         s = []
 
-        for client_1 in self.clients:
+        for client_1 in clients:
             # skip the depot
             if client_1 is self.depot:
                 continue
-            for client_2 in self.clients:
+            for client_2 in clients:
                 # skip the depot
                 if client_2 is self.depot:
                     continue
@@ -58,13 +56,17 @@ class ClarkeWright:
         savings = pd.DataFrame(data={'Start': start, 'End': end, 'Savings': s})
         savings.sort_values(by='Savings', ascending=False, inplace=True)
 
-        # store
-        self.savings = savings
+        return savings
 
-        return self.savings
+    def solve(self, timeslot):
+        # get list of clients with availability in timeslot
+        clients = []
+        for client in self.clients:
+            if timeslot in client.get_availability():
+                clients.append(client)
 
-    def solve(self):
-        savings = self.compute_savings()
+        # compute savings for clients
+        savings = self.compute_savings(clients)
         print(savings)
 
         routes = []
@@ -203,12 +205,11 @@ class ClarkeWright:
 
 if __name__ == "__main__":
     clients = []
-    clients.append(Client('depot', 'Mierlo', None))
-    clients.append(Client('a', 'Geldrop', None))
-    clients.append(Client('b', 'Helmond', None))
-    clients.append(Client('c', 'Someren', None))
-    clients.append(Client('d', 'Deurne Vlierden', None))
+    clients.append(Client('a', 'Geldrop', ['16/05/2024_morning', '16/05/2024_evening']))
+    clients.append(Client('b', 'Helmond', ['16/05/2024_morning', '16/05/2024_evening']))
+    clients.append(Client('c', 'Someren', ['16/05/2024_morning']))
+    clients.append(Client('d', 'Deurne Vlierden', ['16/05/2024_morning', '16/05/2024_evening']))
     # algo = ClarkeWright(['Mierlo', 'Geldrop', 'Helmond', 'Someren', 'Deurne Vlierden'])
     algo = ClarkeWright(clients)
-    algo.solve()
+    algo.solve('16/05/2024_morning')
     print(algo.get_solution())

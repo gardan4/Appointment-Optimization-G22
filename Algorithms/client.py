@@ -12,6 +12,9 @@ class Client:
     def get_location(self):
         return self.location
 
+    def get_availability(self):
+        return self.availability
+
     def set_scheduled(self):
         self.scheduled = True
         self.availability = []
