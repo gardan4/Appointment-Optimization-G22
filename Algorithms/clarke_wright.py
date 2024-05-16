@@ -158,7 +158,7 @@ class ClarkeWright:
 
         for client in final_route[1:len(final_route)-1]:
             print(client)
-            client.set_scheduled()
+            client.set_scheduled(timeslot)
 
         self.route = final_route
         self.compute_route_length()

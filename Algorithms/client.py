@@ -15,6 +15,6 @@ class Client:
     def get_availability(self):
         return self.availability
 
-    def set_scheduled(self):
+    def set_scheduled(self, slot):
         self.scheduled = True
-        self.availability = []
+        self.availability = [slot]
