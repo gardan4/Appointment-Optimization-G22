@@ -147,7 +147,6 @@ class ClarkeWright:
 
         # final_route.append(self.depot)
         # final_route.insert(0, self.depot)
-
         final_route = routes[0]
         routes.pop(0)
 

@@ -13,10 +13,11 @@ def get_definitive_timeslot_clarke(selected_slots, user_data):
     #get all the  appointments in a list
     appointments_in_slot = []
     clients = []
+
     appointments_in_slot.append({
-        "username": f"{user_data['username']}",
-        "location": f"{user_data['location']}",
-        "appointment_date": f"{selected_slots}"
+        "username": user_data['username'],
+        "location": user_data['location'],
+        "appointment_date": selected_slots
     })
     with open("./Data/planned_appointments.json", mode='r') as json_file:
         data = json.load(json_file)
@@ -30,6 +31,9 @@ def get_definitive_timeslot_clarke(selected_slots, user_data):
             clients = [Client(appointment['username'], appointment['location'], [appointment['appointment_date']]) for appointment in appointments_in_slot]
             clarke = ClarkeWright(clients)
             # TODO convert slot 2024-05-17_morning to 17/05/2024_morning format
+            for client in clients:
+                print(client.get_availability())
+            print(slot)
             def_slot = clarke.solve(slot)
             print(def_slot)
 

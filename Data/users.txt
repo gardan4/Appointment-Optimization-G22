@@ -1,2 +1,2 @@
-marc,beek
-bob,neerbeek
+marc,Deurne Vlierden
+bob,Geldrop
