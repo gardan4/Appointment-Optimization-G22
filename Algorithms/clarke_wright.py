@@ -205,11 +205,11 @@ class ClarkeWright:
 
 if __name__ == "__main__":
     clients = []
-    clients.append(Client('a', 'Geldrop', ['16/05/2024_morning', '16/05/2024_evening']))
-    clients.append(Client('b', 'Helmond', ['16/05/2024_morning', '16/05/2024_evening']))
-    clients.append(Client('c', 'Someren', ['16/05/2024_morning']))
-    clients.append(Client('d', 'Deurne Vlierden', ['16/05/2024_morning', '16/05/2024_evening']))
+    clients.append(Client('a', 'Geldrop', ['16-05-2024_morning', '16-05-2024_evening']))
+    clients.append(Client('b', 'Helmond', ['16-05-2024_morning', '16-05-2024_evening']))
+    clients.append(Client('c', 'Someren', ['16-05-2024_morning']))
+    clients.append(Client('d', 'Deurne Vlierden', ['16-05-2024_morning', '16-05-2024_evening']))
     # algo = ClarkeWright(['Mierlo', 'Geldrop', 'Helmond', 'Someren', 'Deurne Vlierden'])
     algo = ClarkeWright(clients)
-    algo.solve('16/05/2024_morning')
+    algo.solve('16-05-2024_morning')
     print(algo.get_solution())
