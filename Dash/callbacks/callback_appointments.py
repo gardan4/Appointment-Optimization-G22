@@ -1,7 +1,7 @@
 from Dash.index import app
 import dash
 from dash.dependencies import Input, Output, State, MATCH, ALL
-from Algorithms.definitive_timeslot import get_definitive_timeslot
+from Algorithms.definitive_timeslot import get_definitive_timeslot_clarke
 
 
 # Example callback to handle time slot selections
@@ -22,7 +22,7 @@ def update_selected_timeslots(n_clicks, selected_timeslots, user_data):
             # If no slots were selected, inform the user
             return 'No timeslots selected, please try again.', ""
 
-        definitive_slot = get_definitive_timeslot(selected_slots, user_data)
+        definitive_slot = get_definitive_timeslot_clarke(selected_slots, user_data)
 
         selected_slots_text = ', '.join(selected_slots)
 
