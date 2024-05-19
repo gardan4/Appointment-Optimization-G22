@@ -23,7 +23,7 @@ class ClarkeWright:
         self.total_distance = 0
 
     def compute_savings(self, clients):
-        self.distances = pd.read_csv('./Data/distance_matrix.csv', index_col=0)
+        self.distances = pd.read_csv('..//Data//distance_matrix.csv', index_col=0)
 
         start = []
         end = []
