@@ -1,63 +1,315 @@
+import sys
+import pandas as pd
 import gurobipy as gp
 from gurobipy import GRB
-import random
 
-# Data
-num_clients = 10
-num_days = 7
-timeslots_per_day = 2
-clients = list(range(1, num_clients + 1))
-days = list(range(1, num_days + 1))
-timeslots = list(range(1, timeslots_per_day + 1))
+# tested with Gurobi v10.0.3
+class Timeslot():
+    def __init__(self, name, cap, depot):
+        self.name = name
+        self.cap = cap
+        self.depot = depot
 
-# Random travel times between clients
-travel_times = {(i, j): random.randint(10, 60) for i in clients for j in clients if i != j}
+    def __str__(self):
+        return f"Technician: {self.name}\n  Capacity: {self.cap}\n  Depot: {self.depot}"
 
-# Gurobi model
-model = gp.Model("client_scheduling")
+class Job():
+    def __init__(self, name, duration, coveredBy):
+        self.name = name
+        self.duration = duration
+        self.coveredBy = coveredBy
 
-# Decision variables
-x = {}  # Client assignment variable
-t = {}  # Travel time variable
+    def __str__(self):
+        about = f"ClientJob: {self.name}\n  Duration: {self.duration}\n  Covered by: "
+        about += ", ".join([t.name for t in self.coveredBy])
+        return about
+    
+class Client():
+    def __init__(self, name, loc, job, tStart, tEnd, tDue):
+        self.name = name
+        self.loc = loc
+        self.job = job
+        self.tStart = tStart
+        self.tEnd = tEnd
+        self.tDue = tDue
 
-for i in clients:
-    for d in days:
-        for time_slot in timeslots:
-            x[i, d, time_slot] = model.addVar(vtype=GRB.BINARY, name=f"x_{i}_{d}_{time_slot}")
+    def __str__(self):
+        coveredBy = ", ".join([t.name for t in self.job.coveredBy])
+        return f"Client: {self.name}\n  Location: {self.loc}\n  ClientJob: {self.job.name}\n  Duration: {self.job.duration}\n  Covered by: {coveredBy}\n  Start time: {self.tStart}\n  End time: {self.tEnd}\n  Due time: {self.tDue}"
+
+
+# Read Excel workbook
+excel_file = r"C:\Users\sekar\Anaconda\envs\mymrpvenv\Sample Data_10.xlsx"
+df = pd.read_excel(excel_file, sheet_name='Timeslots full')
+df = df.rename(columns={df.columns[0]: "name", df.columns[1]: "cap", df.columns[2]: "depot"})
+
+df1 = df.drop(df.columns[3:], axis=1).drop(df.index[[0]])
+# Create Timeslot objects
+timeslots = [Timeslot(*row) for row in df1.itertuples(index=False, name=None)]
+# print(df1)
+
+# Read job data
+jobs=[]
+for j in range(3, len(df.columns)):
+    coveredBy = [t for i, t in enumerate(timeslots) if df.iloc[1+i,j]==1]
+    thisJob = Job(df.iloc[1:,j].name, df.iloc[0,j], coveredBy)
+    jobs.append(thisJob)
+
+# Read location data
+df_locations = pd.read_excel(excel_file, sheet_name='Locations', index_col=0) #, skiprows=1, index_col=0)
+
+# Extract locations and initialize distance dictionary
+locations = df_locations.index
+dist = {(l, l): 0 for l in locations}
+
+# Populate distance dictionary
+for i, l1 in enumerate(locations):
+    for j, l2 in enumerate(locations):
+        if i < j:
+            dist[l1, l2] = df_locations.iloc[i, j]
+            dist[l2, l1] = dist[l1, l2]
+
+# Read customer data
+df_clients = pd.read_excel(excel_file, sheet_name='Clients')
+
+clients = []
+for i, c in enumerate(df_clients.iloc[:, 0]):
+    job_name = df_clients.iloc[i, 2]
+
+    # Find the corresponding Job object
+    matching_job = next((job for job in jobs if job.name == job_name), None)
+
+    if matching_job is not None:
+        # Create Customer object using corresponding Job object
+        this_client = Client(c, df_clients.iloc[i, 1], matching_job, *df_clients.iloc[i, 3:])
+        clients.append(this_client)
+
+def get_latest_times(clients, timeslots):
+    latest = dict()
+    d = dist[clients[-1].loc, timeslots.depot]   # distance back to the depot
+    prev_latest = min(clients[-1].tEnd, 480 - d - clients[-1].job.duration)
+    latest[clients[-1].loc] = prev_latest
+    for i in range(len(clients) - 2, -1, -1):
+        d = dist[clients[i].loc, clients[i + 1].loc]
+        latest_end = min(prev_latest - d - clients[i].job.duration, clients[i].tEnd)
+        latest[clients[i].loc] = latest_end
+        prev_latest = latest_end
+    return latest
+
+def solve_trs0(timeslots, clients, dist):
+    # Build useful data structures
+    K = [k.name for k in timeslots]
+    C = [j.name for j in clients]
+    J = [j.loc for j in clients]
+    L = list(set([l[0] for l in dist.keys()]))
+    D = list(set([t.depot for t in timeslots]))
+    cap = {k.name: k.cap for k in timeslots}
+    loc = {j.name: j.loc for j in clients}
+    depot = {k.name: k.depot for k in timeslots}
+    canCover = {j.name: [k.name for k in j.job.coveredBy] for j in clients}
+    dur = {j.name: j.job.duration for j in clients}
+    tStart = {j.name: j.tStart for j in clients}
+    tEnd = {j.name: j.tEnd for j in clients}
+    #priority = {j.name: j.job.priority for j in customers}
+
+    ### Create model
+    m = gp.Model("trs0")
+
+    ### Decision variables
+    # Client-timeslot assignment
+    x = m.addVars(C, K, vtype=GRB.BINARY, name="x")
+
+    # Timeslot assignment
+    u = m.addVars(K, vtype=GRB.BINARY, name="u")
+
+    # Edge-route assignment to technician
+    y = m.addVars(L, L, K, vtype=GRB.BINARY, name="y")
+
+    # Start time of service
+    t = m.addVars(L, ub=480, name="t")
+
+    # Unfilled jobs
+    g = m.addVars(C, vtype=GRB.BINARY, name="g")
+
+    ### Constraints
+
+    # A timeslot must be assigned to a job, or a gap is declared (1)
+    #m.addConstrs((gp.quicksum(x[j, k] for k in canCover[j]) + g[j] == 1 for j in C), name="assignToJob")
+    m.addConstrs((gp.quicksum(x[j, k] for k in canCover[j]) == 1 for j in C), name="assignToJob")
+    # At most one technician can be assigned to a job (2)
+    #m.addConstrs((x.sum(j, '*') <= 1 for j in C), name="assignOne")
+
+    # Technician capacity constraints (3)
+    capLHS = {k: gp.quicksum(dur[j] * x[j, k] for j in C) + \
+                 gp.quicksum(dist[i, j] * y[i, j, k] for i in L for j in L) for k in K}
+    m.addConstrs((capLHS[k] <= cap[k] * u[k] for k in K), name="timeslotCapacity")
+
+    # Technician tour constraints (4 and 5)
+    m.addConstrs((y.sum('*', loc[j], k) == x[j, k] for k in K for j in C), \
+                 name="techTour1")
+    m.addConstrs((y.sum(loc[j], '*', k) == x[j, k] for k in K for j in C), \
+                 name="techTour2")
+
+    # Same depot constraints (6 and 7)
+    m.addConstrs((gp.quicksum(y[j, depot[k], k] for j in J) == u[k] for k in K), \
+                 name="sameDepot1")
+    m.addConstrs((gp.quicksum(y[depot[k], j, k] for j in J) == u[k] for k in K), \
+                 name="sameDepot2")
+    
+    # Temporal constraints (8) for customer locations
+    M = {(i, j): 480 + dur[i] + dist[loc[i], loc[j]] for i in C for j in C}
+    m.addConstrs((t[loc[j]] >= t[loc[i]] + dur[i] + dist[loc[i], loc[j]] \
+                  - M[i, j] * (1 - gp.quicksum(y[loc[i], loc[j], k] for k in K)) \
+                  for i in C for j in C), name="tempoCustomer")
+
+    # Temporal constraints (8) for depot locations
+    M = {(i, j): 480 + dist[i, loc[j]] for i in D for j in C}
+    m.addConstrs((t[loc[j]] >= t[i] + dist[i, loc[j]] \
+                  - M[i, j] * (1 - y.sum(i, loc[j], '*')) for i in D for j in C), \
+                 name="tempoDepot")
+    
+    # Time window constraints (9 and 10)
+    m.addConstrs((t[loc[j]] >= tStart[j] for j in C), name="timeWinA")
+    m.addConstrs((t[loc[j]] <= tEnd[j] for j in C), name="timeWinB")
+
+    ### Objective function
+    M = 6100
+
+    #m.setObjective(gp.quicksum(M * g[j] for j in C) + gp.quicksum(0.01 * M * t[k] for k in L),GRB.MINIMIZE)
+    m.setObjective(gp.quicksum(0.01 * M * t[k] for k in L),GRB.MINIMIZE)
+
+    m.write("TRS0.lp")
+    m.optimize()
+
+    status = m.Status
+    if status in [GRB.INF_OR_UNBD, GRB.INFEASIBLE, GRB.UNBOUNDED]:
+        print("Model is either infeasible or unbounded.")
+        sys.exit(0)
+    elif status != GRB.OPTIMAL:
+        print("Optimization terminated with status {}".format(status))
+        sys.exit(0)
+
+    ### Print results
+    # Assignments
+    print("")
     for j in clients:
-        if i != j:
-            t[i, j] = model.addVar(vtype=GRB.CONTINUOUS, name=f"t_{i}_{j}")
+        '''if g[j.name].X > 0.5:
+            jobStr = "Nobody assigned to {} ({}) in {}".format(j.name,j.job.name,j.loc)
+        else:
+            for k in K:
+                if x[j.name, k].X > 0.5:
+                    jobStr = f"{k} assigned to {j.name} ({j.job.name}) in {j.loc}. Start at t={t[j.loc].X:.2f}."
+        print(jobStr)'''
+        for k in K:
+            if x[j.name, k].X > 0.5:
+                jobStr = f"{k} assigned to {j.name} ({j.job.name}) in {j.loc}. Start at t={t[j.loc].X:.2f}."
+        print(jobStr)
+    # Timeslots
+    print("")
+    for k in timeslots:
+        if u[k.name].X > 0.5:
+            cur = k.depot
+            route = k.depot
+            while True:
+                for j in clients:
+                    if y[cur,j.loc,k.name].X > 0.5:
+                        route += (f" -> {j.loc} (dist={dist[cur, j.loc]}, t={t[j.loc].X:.2f},"
+                                  f" proc={j.job.duration}, a={tStart[j.name]}, b={tEnd[j.name]})")
+                        cur = j.loc
+                for i in D:
+                    if y[cur,i,k.name].X > 0.5:
+                        route += " -> {} (dist={})".format(i,dist[cur, i])
+                        cur = i
+                        break
+                if cur == k.depot:
+                    break
+            print("{}'s route: {}".format(k.name, route))
+        else:
+            print("{} is not used".format(k.name))
 
-# Constraints
-for i in clients:
-    model.addConstr(gp.quicksum(x[i, d, time_slot] for d in days for time_slot in timeslots) == 1)
+            
+    # Utilization
+    print("")
+    for k in K:
+        used = capLHS[k].getValue()
+        total = cap[k]
+        util = used / cap[k] if cap[k] > 0 else 0
+        print("{}'s utilization is {:.2%} ({:.2f}/{:.2f})".format(k, util, used, cap[k]))
+    totUsed = sum(capLHS[k].getValue() for k in K)
+    totCap = sum(cap[k] for k in K)
+    totUtil = totUsed / totCap if totCap > 0 else 0
+    print("Total timeslot utilization is {:.2%} ({:.2f}/{:.2f})".format(totUtil, totUsed, totCap))
+    
+    def create_excel_output():
+        routes_cols = ['Route ID', 'Timselot Name', 'Origin Location', 'Total Travel Time', 'Total Processing Time',
+                       'Total Time', 'Earliest Start Time', 'Latest Start Time', 'Earliest End Time',
+                       'Latest End Time', 'Num Jobs']
+        routes_list = []
+        orders_cols = ['Route ID', 'Stop Number', 'Client Name', 'Timeslot Name', 'Location Name', 'Job type',
+                       'Processing Time', 'Client Time Window Start', 'Client Time Window End',
+                       'Earliest Start', 'Latest Start', 'Earliest End', 'Latest End', ]
+        route_id = 0
+        orders_list = []
+        for k in timeslots:
+            if u[k.name].X > 0.5:
+                clients_list = []
+                route_id += 1
+                total_distance, total_travel_time, total_processing_time = 0, 0, 0
+                cur = k.depot
+                while True:
+                    for j in clients:
+                        if y[cur, j.loc, k.name].X > 0.5:
+                            total_travel_time += dist[cur, j.loc]
+                            total_distance += dist[cur, j.loc]
+                            total_processing_time += j.job.duration
+                            clients_list.append(j)
+                            cur = j.loc
+                    for i in D:
+                        if y[cur, i, k.name].X > 0.5:
+                            total_travel_time += dist[cur, i]
+                            total_distance += dist[cur, i]
+                            cur = i
+                            break
+                    if cur == k.depot:
+                        break
+                latest = get_latest_times(clients_list, k)
 
-for d in days:
-    for time_slot in timeslots:
-        model.addConstr(gp.quicksum(x[i, d, time_slot] for i in clients) <= 1)
+                # append clients to the list of orders
+                for i, j in enumerate(clients_list):
+                    orders_list.append([route_id, i + 1, j.name, k.name, j.loc, j.job.name,
+                                        j.job.duration, tStart[j.name], tEnd[j.name],
+                                        t[j.loc].X, latest[j.loc],
+                                        t[j.loc].X + j.job.duration, latest[j.loc] + j.job.duration])
 
-for i in clients:
-    for j in clients:
-        if i != j:
-            for d in days:
-                for time_slot in timeslots:
-                    model.addConstr(t[i, j] >= travel_times[i, j] * (x[i, d, time_slot] + x[j, d, time_slot] - 1))
+                # append route to routes list
+                earliest_start_route = t[clients_list[0].loc].X - dist[k.depot, clients_list[0].loc]
+                latest_start_route = latest[clients_list[0].loc] - dist[k.depot, clients_list[0].loc]
+                earliest_end_route = t[clients_list[-1].loc].X + clients_list[-1].job.duration + \
+                                     dist[clients_list[-1].loc, k.depot]
+                latest_end_route = latest[clients_list[-1].loc] + clients_list[-1].job.duration + \
+                                   dist[clients_list[-1].loc, k.depot]
 
-# Objective Function
-model.setObjective(gp.quicksum(t[i, j] for i in clients for j in clients if i != j), GRB.MINIMIZE)
+                routes_list.append([route_id, k.name, k.depot, total_travel_time, total_processing_time,
+                                    earliest_end_route - earliest_start_route, earliest_start_route,
+                                    latest_start_route, earliest_end_route, latest_end_route, len(clients_list)])
+        # Convert to dataframe and write to excel
+        routes_df = pd.DataFrame.from_records(routes_list, columns=routes_cols)
+        routes_df.to_csv('routes.csv', index=False)
+        orders_df = pd.DataFrame.from_records(orders_list, columns=orders_cols)
+        orders_df.to_csv('orders.csv', index=False)
+    
+    # create output files
+    create_excel_output()
+    
+    m.dispose()
+    gp.disposeDefaultEnv()
 
-# Solve the optimization problem
-model.optimize()
+def printScen(scenStr):
+    sLen = len(scenStr)
+    print("\n" + "*"*sLen + "\n" + scenStr + "\n" + "*"*sLen + "\n")
 
-if model.status == GRB.OPTIMAL:
-    print("Optimal solution found!")
-    for i in clients:
-        for d in days:
-            for time_slot in timeslots:
-                if x[i, d, time_slot].x > 0.5:
-                    print(f"Client {i} scheduled on day {d}, timeslot {time_slot}")
-else:
-    print("No optimal solution found.")
-
-
+if __name__ == "__main__":
+    # Base model
+    printScen("Solving base scenario model")
+    solve_trs0(timeslots, clients, dist)
 
