@@ -2,11 +2,22 @@
   {
     "username": "marc",
     "location": "Deurne Vlierden",
-    "appointment_date": ["2024-05-22_morning"]
+    "appointment_date": [
+      "2024-05-22_morning"
+    ]
   },
   {
     "username": "bob",
     "location": "Geldrop",
-    "appointment_date": ["2024-05-22_evening"]
+    "appointment_date": [
+      "2024-05-22_evening"
+    ]
+  },
+  {
+    "username": "jan",
+    "location": "Helmond",
+    "appointment_date": [
+      "2024-05-22_morning"
+    ]
   }
 ]

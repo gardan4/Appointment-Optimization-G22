@@ -40,6 +40,9 @@ def get_definitive_timeslot_clarke(selected_slots, user_data):
         for slot in selected_slots:
             # get all the appointments for the selected slot from the json file
             for row in data:
+                #check if this user already has an appointment in this slot
+                if row['username'] == user_data['username'] and row['appointment_date'][0] == slot and row['location'] == user_data['location']:
+                    return f"You already have an appointment in this slot: ({slot}). Please select another slot."
                 if row['appointment_date'][0] == slot:
                     appointments_in_slot_old.append(row)
                     appointments_in_slot_new.append(row)
@@ -67,7 +70,12 @@ def get_definitive_timeslot_clarke(selected_slots, user_data):
                 time_increase = solutions_new[i][0][1] - solutions_old[i][0][1]
                 smallest_time_increase_route = solutions_new[i]
 
-    return smallest_time_increase_route[1]
+    # add the new appointment to the json file
+    with open("./Data/planned_appointments.json", mode='w') as json_file:
+        data.append({"username": user_data['username'], "location": user_data['location'], "appointment_date": [smallest_time_increase_route[1]]})
+        json.dump(data, json_file)
+
+    return f"Appointment made at slot: {smallest_time_increase_route[1]}"
 
 
 def get_definitive_timeslot_milp(selected_slots, user_data):
