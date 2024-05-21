@@ -3,6 +3,10 @@
     "username": "marc",
     "location": "Deurne Vlierden",
     "appointment_date": ["2024-05-22_morning"]
+  },
+  {
+    "username": "bob",
+    "location": "Geldrop",
+    "appointment_date": ["2024-05-22_evening"]
   }
-
 ]

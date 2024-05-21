@@ -44,7 +44,7 @@ class ClarkeWright:
                 # calculate savings for each pair of clients
                 if client_1 is not client_2:
 
-                    print(client_1.get_location())
+                    # print(client_1.get_location())
                     dist_1 = self.distances[self.depot.get_location()].loc[client_1.get_location()]
                     dist_2 = self.distances[self.depot.get_location()].loc[client_2.get_location()]
                     dist_clients = self.distances[client_1.get_location()].loc[client_2.get_location()]
@@ -78,7 +78,7 @@ class ClarkeWright:
 
         # compute savings for clients
         savings = self.compute_savings(clients, path)
-        print(savings)
+        # print(savings)
 
         routes = []
 
@@ -164,7 +164,7 @@ class ClarkeWright:
                 final_route = route
 
         for client in final_route[1:len(final_route) - 1]:
-            print(client)
+            # print(client)
             client.set_scheduled(timeslot)
 
         self.route = final_route
@@ -186,7 +186,7 @@ class ClarkeWright:
         return self.total_distance
 
     def get_solution(self):
-        return self.get_route(), to_hours(self.total_distance)
+        return self.get_route(), self.total_distance
 
     def get_route(self):
         route = []
@@ -215,10 +215,8 @@ if __name__ == "__main__":
     clients.append(Client('a', 'Geldrop', ['2024-05-16_morning', '2024-05-16_evening']))
     clients.append(Client('b', 'Helmond', ['2024-05-16_morning', '2024-05-16_evening']))
     clients.append(Client('c', 'Someren', ['2024-05-16_morning']))
-    # clients.append(Client('d', 'Deurne Vlierden', ['2024-05-16_morning', '2024-05-16_evening']))
-    algo = ClarkeWright(['Mierlo', 'Geldrop', 'Helmond', 'Someren', 'Deurne Vlierden'])
-    for client in clients:
-        print(client.name, client.location, client.availability)
+    clients.append(Client('d', 'Deurne Vlierden', ['2024-05-16_morning', '2024-05-16_evening']))
+    # algo = ClarkeWright(['Mierlo', 'Geldrop', 'Helmond', 'Someren', 'Deurne Vlierden'])
     algo = ClarkeWright(clients)
     algo.solve('2024-05-16_morning', '..\Data\distance_matrix.csv')
     print(algo.get_solution())
