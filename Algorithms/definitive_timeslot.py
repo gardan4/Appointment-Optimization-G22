@@ -21,6 +21,7 @@ def get_definitive_timeslot_clarke(selected_slots, user_data):
     })
     with open("./Data/planned_appointments.json", mode='r') as json_file:
         data = json.load(json_file)
+        solutions = []
         for slot in selected_slots:
             #get all the appointments for the selected slot from the json file
             for row in data:
@@ -28,17 +29,12 @@ def get_definitive_timeslot_clarke(selected_slots, user_data):
                     appointments_in_slot.append(row)
 
             #create all the clients in a list
-            clients = [Client(appointment['username'], appointment['location'], [appointment['appointment_date']]) for appointment in appointments_in_slot]
+            clients = [Client(appointment['username'], appointment['location'], appointment['appointment_date']) for appointment in appointments_in_slot]
             clarke = ClarkeWright(clients)
-            # TODO convert slot 2024-05-17_morning to 17/05/2024_morning format
-            for client in clients:
-                print(client.get_availability())
-            print(slot)
-            def_slot = clarke.solve(slot)
-            print(def_slot)
+            clarke.solve(slot, ".\Data\distance_matrix.csv")
+            solutions.append(clarke.get_solution())
+        print(solutions)
 
-
-            pass
     return ""
 
 def get_definitive_timeslot_milp(selected_slots, user_data):

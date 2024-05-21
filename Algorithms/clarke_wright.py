@@ -2,6 +2,7 @@ import math
 
 import pandas as pd
 import numpy as np
+import os
 
 from Algorithms.client import Client
 
@@ -22,8 +23,8 @@ class ClarkeWright:
         self.distances = None
         self.total_distance = 0
 
-    def compute_savings(self, clients):
-        self.distances = pd.read_csv('..//Data//distance_matrix.csv', index_col=0)
+    def compute_savings(self, clients, path):
+        self.distances = pd.read_csv(path, index_col=0)
 
         start = []
         end = []
@@ -58,21 +59,30 @@ class ClarkeWright:
 
         return savings
 
-    def solve(self, timeslot):
+    def solve(self, timeslot, path):
         # get list of clients with availability in timeslot
         clients = []
         for client in self.clients:
             if timeslot in client.get_availability():
                 clients.append(client)
 
+        # If there is only one client, create a direct route
+        if len(clients) == 1:
+            # Load distances
+            self.distances = pd.read_csv(path, index_col=0)
+            single_route = [self.depot, clients[0], self.depot]
+            clients[0].set_scheduled(timeslot)
+            self.route = single_route
+            self.compute_route_length()
+            return self.route
+
         # compute savings for clients
-        savings = self.compute_savings(clients)
+        savings = self.compute_savings(clients, path)
         print(savings)
 
         routes = []
 
         for _, row in savings.iterrows():
-
             start_point = None
             end_point = None
             skip = False
@@ -93,7 +103,6 @@ class ClarkeWright:
             # if both are not included, add new route
             if start_point is None and end_point is None:
                 new_route = [row['Start'], row['End']]
-
                 routes.append(new_route)
 
             # if one is not included, then add to existing route (only if route is not full yet)
@@ -110,7 +119,6 @@ class ClarkeWright:
                     routes[start_point].append(row['End'])
                 else:
                     new_route = [row['Start'], row['End']]
-
                     routes.append(new_route)
 
             # if included in different routes, merge them
@@ -155,7 +163,7 @@ class ClarkeWright:
             if len(route) > len(final_route):
                 final_route = route
 
-        for client in final_route[1:len(final_route)-1]:
+        for client in final_route[1:len(final_route) - 1]:
             print(client)
             client.set_scheduled(timeslot)
 
@@ -207,8 +215,10 @@ if __name__ == "__main__":
     clients.append(Client('a', 'Geldrop', ['2024-05-16_morning', '2024-05-16_evening']))
     clients.append(Client('b', 'Helmond', ['2024-05-16_morning', '2024-05-16_evening']))
     clients.append(Client('c', 'Someren', ['2024-05-16_morning']))
-    clients.append(Client('d', 'Deurne Vlierden', ['2024-05-16_morning', '2024-05-16_evening']))
-    # algo = ClarkeWright(['Mierlo', 'Geldrop', 'Helmond', 'Someren', 'Deurne Vlierden'])
+    # clients.append(Client('d', 'Deurne Vlierden', ['2024-05-16_morning', '2024-05-16_evening']))
+    algo = ClarkeWright(['Mierlo', 'Geldrop', 'Helmond', 'Someren', 'Deurne Vlierden'])
+    for client in clients:
+        print(client.name, client.location, client.availability)
     algo = ClarkeWright(clients)
-    algo.solve('2024-05-16_morning')
+    algo.solve('2024-05-16_morning', '..\Data\distance_matrix.csv')
     print(algo.get_solution())
