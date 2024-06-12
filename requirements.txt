@@ -1,6 +1,8 @@
 pandas~=2.2.2
 numpy~=1.26.4
-dash
+dash~=2.16.1
 dash-bootstrap-components
 dash_mantine_components == 0.13.0a3
-dash_ag_grid
+dash_ag_grid~=31.2.0
+names
+requests~=2.31.0
