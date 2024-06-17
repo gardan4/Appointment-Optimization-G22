@@ -178,7 +178,7 @@ class ClarkeWright:
         for i in range(len(self.route) - 1):
             length += self.distances[self.route[i].get_location()].loc[self.route[i+1].get_location()]
 
-            if self.route[i].get_location() is not self.depot:
+            if self.route[i] is not self.depot:
                 length += 60
 
         self.total_distance = length
@@ -186,7 +186,7 @@ class ClarkeWright:
         return self.total_distance
 
     def get_solution(self):
-        return self.get_route(), self.total_distance
+        return self.get_route(), to_hours(self.compute_route_length())
 
     def get_route(self):
         route = []
@@ -209,6 +209,45 @@ class ClarkeWright:
 
         return client in solution
 
+    def solve_2(self, customer, current_route, path):
+        self.distances = pd.read_csv(path, index_col=0)
+
+        if len(current_route) == 2:
+            current_route.insert(1, customer)
+            self.route = current_route
+            return current_route
+
+        best_s, index = self.compute_savings_new(customer, current_route)
+
+        #if best_s >= 0:
+        current_route.insert(index, customer)
+
+        self.route = current_route
+
+        return current_route
+
+    def compute_savings_new(self, customer, current_route):
+        best_s = float('-inf')
+        location = None
+
+        for i in range(len(current_route) - 1):
+            d_depot = self.distances[current_route[0].get_location()].loc[customer.get_location()]
+            d_before = self.distances[current_route[i].get_location()].loc[customer.get_location()]
+            d_after = self.distances[current_route[i + 1].get_location()].loc[customer.get_location()]
+            d_neighbours = self.distances[current_route[i].get_location()].loc[current_route[i+1].get_location()]
+
+            s = 2 * d_depot + d_neighbours - (d_before + d_after)
+
+            if s >= best_s:
+                best_s = s
+                location = i + 1
+
+        return best_s, location
+
+    def is_recommended(self, customer, current_route):
+        best_s, _ = self.compute_savings_new(customer, current_route)
+
+        return best_s >= 0
 
 if __name__ == "__main__":
     clients = []
@@ -218,5 +257,13 @@ if __name__ == "__main__":
     clients.append(Client('d', 'Deurne Vlierden', ['2024-05-16_morning', '2024-05-16_evening']))
     # algo = ClarkeWright(['Mierlo', 'Geldrop', 'Helmond', 'Someren', 'Deurne Vlierden'])
     algo = ClarkeWright(clients)
-    algo.solve('2024-05-16_morning', '..\Data\distance_matrix.csv')
+    #algo.solve('2024-05-16_morning', '..\\Data\\distance_matrix.csv')
+    client_1 = Client('a', 'Someren', None)
+    client_2 = Client('b', 'Geldrop', None)
+    client_3 = Client('c', 'Helmond', None)
+    solution = algo.solve_2(client_1, [algo.depot, algo.depot], '..\\Data\\distance_matrix.csv')
+    print(algo.get_solution())
+    solution = algo.solve_2(client_2, solution, '..\\Data\\distance_matrix.csv')
+    print(algo.get_solution())
+    solution = algo.solve_2(client_3, solution, '..\\Data\\distance_matrix.csv')
     print(algo.get_solution())
