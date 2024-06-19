@@ -212,11 +212,13 @@ class ClarkeWright:
 
 if __name__ == "__main__":
     clients = []
-    clients.append(Client('Wade White', 'Someren', ['2024-06-02_morning']))
+    clients.append(Client('Wade White', 'Geldrop', ['2024-06-06_evening']))
+    clients.append(Client('Wade Whasdite', 'Geldrop', ['2024-06-06_evening']))
+    # clients.append(Client('Wade xc', 'Someren', ['2024-06-02_morning']))
     # clients.append(Client('b', 'Helmond', ['2024-05-16_morning', '2024-05-16_evening']))
     # clients.append(Client('c', 'Someren', ['2024-05-16_morning']))
     # clients.append(Client('d', 'Deurne Vlierden', ['2024-05-16_morning', '2024-05-16_evening']))
     # algo = ClarkeWright(['Mierlo', 'Geldrop', 'Helmond', 'Someren', 'Deurne Vlierden'])
     algo = ClarkeWright(clients)
-    algo.solve('2024-06-02_morning', '..\Data\distance_matrix.csv')
+    algo.solve('2024-06-06_evening', '..\Data\distance_matrix.csv')
     print(algo.get_solution())
