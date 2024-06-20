@@ -251,12 +251,15 @@ class ClarkeWright:
 
 if __name__ == "__main__":
     clients = []
-    clients.append(Client('a', 'Geldrop', ['2024-05-16_morning', '2024-05-16_evening']))
-    clients.append(Client('b', 'Helmond', ['2024-05-16_morning', '2024-05-16_evening']))
-    clients.append(Client('c', 'Someren', ['2024-05-16_morning']))
-    clients.append(Client('d', 'Deurne Vlierden', ['2024-05-16_morning', '2024-05-16_evening']))
+    clients.append(Client('Wade White', 'Asten Heusden Ommel', ['2024-06-06_evening']))
+    clients.append(Client('Wade Whasdite', 'Asten Heusden Ommel', ['2024-06-06_evening']))
+    # clients.append(Client('Wade xc', 'Someren', ['2024-06-02_morning']))
+    # clients.append(Client('b', 'Helmond', ['2024-05-16_morning', '2024-05-16_evening']))
+    # clients.append(Client('c', 'Someren', ['2024-05-16_morning']))
+    # clients.append(Client('d', 'Deurne Vlierden', ['2024-05-16_morning', '2024-05-16_evening']))
     # algo = ClarkeWright(['Mierlo', 'Geldrop', 'Helmond', 'Someren', 'Deurne Vlierden'])
     algo = ClarkeWright(clients)
+
     #algo.solve('2024-05-16_morning', '..\\Data\\distance_matrix.csv')
     client_1 = Client('a', 'Someren', None)
     client_2 = Client('b', 'Geldrop', None)
@@ -266,4 +269,7 @@ if __name__ == "__main__":
     solution = algo.solve_2(client_2, solution, '..\\Data\\distance_matrix.csv')
     print(algo.get_solution())
     solution = algo.solve_2(client_3, solution, '..\\Data\\distance_matrix.csv')
+
+    algo.solve('2024-06-06_evening', '..\Data\distance_matrix.csv')
+
     print(algo.get_solution())
