@@ -13,7 +13,7 @@ def get_disabled_timeslots(dates, location):
             if timeslot == 'morning' and not get_travel_possible(location, date, timeslot):
                 disable[0] = True
             elif timeslot == 'evening' and not get_travel_possible(location, date, timeslot):
-                disable[1] = True
+                disable[1] = False
         disabled.append(disable)
     return disabled
 
@@ -21,4 +21,4 @@ def get_travel_possible(location, date, timeslot):
     """
     Check if travel time is possible
     """
-    return True
+    return False

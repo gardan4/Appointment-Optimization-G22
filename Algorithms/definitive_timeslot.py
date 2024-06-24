@@ -32,7 +32,7 @@ def get_definitive_timeslot_clarke(selected_slots, user_data):
         "location": user_data['location'],
         "appointment_date": selected_slots
     })
-    with open("./Data/planned_appointments.json", mode='r') as json_file:
+    with open("..//Data/planned_appointments.json", mode='r') as json_file:
         data = json.load(json_file)
 
         solutions_new = []
@@ -51,14 +51,14 @@ def get_definitive_timeslot_clarke(selected_slots, user_data):
             clients_old = [Client(appointment['username'], appointment['location'], appointment['appointment_date']) for
                            appointment in appointments_in_slot_old]
             clarke_old = ClarkeWright(clients_old)
-            clarke_old.solve(slot, ".\Data\distance_matrix.csv")
+            clarke_old.solve(slot, "..//Data/distance_matrix.csv")
             solutions_old.append([clarke_old.get_solution(), slot])
 
             # new solutions
             clients_new = [Client(appointment['username'], appointment['location'], appointment['appointment_date']) for
                            appointment in appointments_in_slot_new]
             clarke_new = ClarkeWright(clients_new)
-            clarke_new.solve(slot, ".\Data\distance_matrix.csv")
+            clarke_new.solve(slot, "..//Data/distance_matrix.csv")
             solutions_new.append([clarke_new.get_solution(), slot])
 
         # get the route with the smallest time increase
@@ -71,7 +71,7 @@ def get_definitive_timeslot_clarke(selected_slots, user_data):
                 smallest_time_increase_route = solutions_new[i]
 
     # add the new appointment to the json file
-    with open("./Data/planned_appointments.json", mode='w') as json_file:
+    with open("..//Data/planned_appointments.json", mode='w') as json_file:
         data.append({"username": user_data['username'], "location": user_data['location'], "appointment_date": [smallest_time_increase_route[1]]})
         json.dump(data, json_file)
 
