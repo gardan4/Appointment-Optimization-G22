@@ -24,6 +24,12 @@ class ClarkeWright:
         self.total_distance = 0
 
     def compute_savings(self, clients, path):
+        '''
+        Calculates the savings according to the original Clarke-Wright Savings Algorithm
+        :param clients: List of clients for which we want to compute the savings
+        :param path: Directory where the distance matrix is stored
+        :return: Dataframe with the savings for each start and end point, sorted in decreasing order
+        '''
         self.distances = pd.read_csv(path, index_col=0)
 
         start = []
@@ -60,6 +66,12 @@ class ClarkeWright:
         return savings
 
     def solve(self, timeslot, path):
+        '''
+        Solves the original Clarke-Wright Savings Algorithm
+        :param timeslot: string of the timeslot for which we want to compute the route
+        :param path: directory where the distance matrix is stored
+        :return: the schedule for the timeslot, and the total travel time of this route
+        '''
         # get list of clients with availability in timeslot
         clients = []
         for client in self.clients:
@@ -173,6 +185,10 @@ class ClarkeWright:
         return self.route
 
     def compute_route_length(self):
+        '''
+        Computes the duration required to complete a route
+        :return: the sum of total travel times, including the time spent at each client
+        '''
         length = 0
 
         for i in range(len(self.route) - 1):
@@ -210,6 +226,14 @@ class ClarkeWright:
         return client in solution
 
     def solve_2(self, customer, current_route, path):
+        '''
+        Solves the modified Clarke-Wright Savings Algorithm, adapted for online arrival of clients
+        Needs to be solved for every timeslot in the client's availability
+        :param customer: Client object to be scheduled
+        :param current_route: Ordered list of the current schedule
+        :param path: directory where the distance matrix is stored
+        :return: Ordered list of the current schedule, including the new client
+        '''
         self.distances = pd.read_csv(path, index_col=0)
 
         if len(current_route) == 2:
@@ -227,6 +251,15 @@ class ClarkeWright:
         return current_route
 
     def compute_savings_new(self, customer, current_route):
+        '''
+        Computes the savings for the online adaptation of the Clarke-Wright Savings Algorithm
+        :param customer: Client object to compute savings for
+        :param current_route: Ordered list of the current schedule
+        :return: Preferred savings and location in the current schedule
+        '''
+        if current_route is None:
+            return 0, 1
+
         best_s = float('-inf')
         location = None
 
@@ -257,7 +290,7 @@ if __name__ == "__main__":
     clients.append(Client('d', 'Deurne Vlierden', ['2024-05-16_morning', '2024-05-16_evening']))
     # algo = ClarkeWright(['Mierlo', 'Geldrop', 'Helmond', 'Someren', 'Deurne Vlierden'])
     algo = ClarkeWright(clients)
-    #algo.solve('2024-05-16_morning', '..\\Data\\distance_matrix.csv')
+    # algo.solve('2024-05-16_morning', '..\\Data\\distance_matrix.csv')
     client_1 = Client('a', 'Someren', None)
     client_2 = Client('b', 'Geldrop', None)
     client_3 = Client('c', 'Helmond', None)
