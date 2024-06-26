@@ -1,8 +1,9 @@
 class Client:
-    def __init__(self, name, location, availability):
+    def __init__(self, name, location, availability, appointment_time=None):
         self.name = name
         self.location = location
         self.availability = availability
+        self.appointment_time = appointment_time
 
         self.scheduled = False
 
