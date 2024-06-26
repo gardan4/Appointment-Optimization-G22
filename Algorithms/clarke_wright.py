@@ -251,21 +251,33 @@ class ClarkeWright:
 
 if __name__ == "__main__":
     clients = []
-    clients.append(Client('Wade White', 'Asten Heusden Ommel', ['2024-06-06_evening']))
-    clients.append(Client('Wade Whasdite', 'Asten Heusden Ommel', ['2024-06-06_evening']))
+    # Melissa Olson Gemert Handel ['2024-07-03_evening', '2024-06-26_evening', '2024-07-10_evening']
+    # Karl Fanter Gemert Handel ['2024-06-25_morning', '2024-06-24_evening']
+    # James Camacho Deurne Vlierden ['2024-07-14_morning', '2024-07-24_morning']
+    # Jennifer Eller Gemert Handel ['2024-06-24_evening', '2024-06-16_morning']
+    # Douglas Olden Gemert Handel ['2024-07-06_morning', '2024-07-20_evening']
+    clients.append(Client('Melissa Olson', 'Gemert Handel', ['2024-07-03_evening', '2024-06-26_evening', '2024-07-10_evening', '2024-06-24_evening']))
+    clients.append(Client('Karl Fanter', 'Gemert Handel', ['2024-06-25_morning', '2024-06-24_evening']))
+    clients.append(Client('James Camacho', 'Deurne Vlierden', ['2024-07-14_morning', '2024-07-24_morning']))
+    clients.append(Client('Jennifer Eller', 'Gemert Handel', ['2024-06-24_evening', '2024-06-16_morning']))
+    clients.append(Client('Douglas Olden', 'Gemert Handel', ['2024-07-06_morning', '2024-07-20_evening']))
     algo = ClarkeWright(clients)
-    algo.solve('2024-06-06_evening', '..\Data\distance_matrix.csv')
+    algo.solve('2024-06-24_evening', '..\Data\distance_matrix.csv')
+    algo.solve('2024-07-20_evening', '..\Data\distance_matrix.csv')
     print(algo.get_solution())
+    for client in clients:
+        print(client.get_availability())
+
 
     #algo.solve('2024-05-16_morning', '..\\Data\\distance_matrix.csv')
-    client_1 = Client('a', 'Someren', None)
-    client_2 = Client('b', 'Geldrop', None)
-    client_3 = Client('c', 'Helmond', None)
-    solution = algo.solve_2(client_1, [algo.depot, algo.depot], '..\\Data\\distance_matrix.csv')
-    print(algo.get_solution())
-    solution = algo.solve_2(client_2, solution, '..\\Data\\distance_matrix.csv')
-    print(algo.get_solution())
-    solution = algo.solve_2(client_3, solution, '..\\Data\\distance_matrix.csv')
+    # client_1 = Client('a', 'Someren', None)
+    # client_2 = Client('b', 'Geldrop', None)
+    # client_3 = Client('c', 'Helmond', None)
+    # solution = algo.solve_2(client_1, [algo.depot, algo.depot], '..\\Data\\distance_matrix.csv')
+    # print(algo.get_solution())
+    # solution = algo.solve_2(client_2, solution, '..\\Data\\distance_matrix.csv')
+    # print(algo.get_solution())
+    # solution = algo.solve_2(client_3, solution, '..\\Data\\distance_matrix.csv')
 
 
 
