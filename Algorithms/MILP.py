@@ -114,7 +114,7 @@ def solve_trs0(timeslots, clients, dist):
     # Timeslot assignment
     u = m.addVars(K, vtype=GRB.BINARY, name="u")
 
-    # Edge-route assignment to technician
+    # Edge-route assignment
     y = m.addVars(L, L, K, vtype=GRB.BINARY, name="y")
 
     # Start time of service
