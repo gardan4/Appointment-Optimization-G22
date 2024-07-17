@@ -49,5 +49,5 @@ if __name__ == "__main__":
         "Asten Heusden Ommel", "Deurne Vlierden", "Geldrop", "Gemert Handel",
         "Helmond", "Helmond Brandevoort", "Mierlo", "Nuenen Gerwen Nederwetten", "Someren"
     ]
-    api_key = "AIzaSyAn6k7bgguxLTkSCeZg5VAQVx9cZo8_Czo"
+    api_key = ""
     save_distance_matrix_to_csv(locations, api_key, "..//Data//distance_matrix_google.csv")
